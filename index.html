@@ -173,13 +173,24 @@
                 p: document.getElementById('price').value,
                 q: parseInt(document.getElementById('qty').value) || 0
             };
-            if(part.car && part.n) {
-                database.push(part);
-                localStorage.setItem('hrk_parts_db', JSON.stringify(database));
-                renderRecent();
-                ['carName','brandName','partName','code','alt','price','qty'].forEach(id => document.getElementById(id).value = "");
-                alert("Mal bazaya əlavə edildi!");
-            }
+                if(part.car && part.n) {
+        // Google Cədvələ göndərmə hissəsi
+        fetch("https://script.google.com/macros/s/AKfycbxX8RkwTALd5bJbk2jJs3R44zU7ZX-Twh7EDZtqFft3QbeimMa7s1H80SngVU26IIFE-Q/exec", {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({ name: part.n, code: part.c })
+        });
+
+        // Mövcud sayt funksiyaların
+        database.push(part);
+        localStorage.setItem('hrk_parts_db', JSON.stringify(database));
+        renderRecent();
+        ['carName','brandName','partName','code','alt','price','qty'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        alert("Məlumat həm sayta, həm də Ramizin cədvəlinə əlavə edildi!");
+                }
+            
         }
 
         function renderRecent() {
