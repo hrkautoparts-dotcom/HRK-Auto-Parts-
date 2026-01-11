@@ -174,11 +174,42 @@
                 q: parseInt(document.getElementById('qty').value) || 0
             };
                 if(part.car && part.n) {
-        // Google Cədvələ göndərmə hissəsi
-        fetch("https://script.google.com/macros/s/AKfycbxX8RkwTALd5bJbk2jJs3R44zU7ZX-Twh7EDZtqFft3QbeimMa7s1H80SngVU26IIFE-Q/exec", {
+        // 1. Malı cədvələ göndər
+        fetch("BURAYA_O_YENİ_LİNKİ_YAPIŞDIR", {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify({ name: part.n, code: part.c })
+        }).then(() => {
+            // 2. Mal gedəndən sonra siyahını yenilə
+            renderRecent();
+        });
+
+        // Xanaları təmizlə
+        ['carName','brandName','partName','code','alt','price','qty'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        alert("Mal hər iki telefonda görünəcək!");
+    }
+
+// BÜTÜN TELEFONLARDA EYNİ SİYAHINI GÖSTƏRƏN HİSSƏ
+function renderRecent() {
+    const container = document.getElementById('recentList');
+    const url = "BURAYA_O_YENİ_LİNKİ_YAPIŞDIR"; 
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            // Son 10 malı göstərir
+            const lastItems = data.slice(-10).reverse();
+            container.innerHTML = lastItems.map(item => `
+                <div style="border-bottom:1px dashed #ccc; padding:10px;">
+                    <b>${item[0]}</b> | Kod: ${item[1]} <br>
+                    <small style="color:gray;">${item[2]}</small>
+                </div>
+            `).join('');
+        });
+}
+
         });
 
         // Mövcud sayt funksiyaların
