@@ -162,40 +162,64 @@
 
         function saveCart() { localStorage.setItem('hrk_notes', document.getElementById('cartInput').value); toggleCart(); }
 
-        function addNewPart() {
-            const part = {
-                id: Date.now(),
-                car: document.getElementById('carName').value,
-                b: document.getElementById('brandName').value,
-                n: document.getElementById('partName').value,
-                c: document.getElementById('code').value,
-                a: document.getElementById('alt').value,
+        .getElementById('alt').value,
                 p: document.getElementById('price').value,
                 q: parseInt(document.getElementById('qty').value) || 0
             };
+
+  function addNewPart() {
+    const part = {
+        id: Date.now(),
+        car: document.getElementById('carName').value,
+        b: document.getElementById('brandName').value,
+        n: document.getElementById('partName').value,
+        c: document.getElementById('code').value,
+        a: document.getElementById('alt').value,
+        p: document.getElementById('price').value,
+        q: parseInt(document.getElementById('qty').value) || 0
+    };
+
     if(part.car && part.n) {
         // Cədvələ göndərmə (POST)
         fetch("https://script.google.com/macros/s/AKfycbxX8RkwTALd5bJbk2jJs3R44zU7ZX-Twh7EDZtqFft3QbeimMa7s1H80SngVU26IIFE-Q/exec", {
             method: "POST",
             mode: "no-cors",
-            body: JSON.stringify({ name: part.n, code: part.c })
+            body: JSON.stringify({ name: part.car + " - " + part.n, code: part.c })
         }).then(() => {
             renderRecent(); 
         });
 
-        // Saytda göstərmə (Yaddaş üçün)
         database.push(part);
         localStorage.setItem('hrk_parts_db', JSON.stringify(database));
         
-        // Xanaları təmizlə
-        ['carName','brandName','partName','code'].forEach(id => {
+        ['carName','brandName','partName','code','alt','price','qty'].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.value = '';
         });
-        alert("Mal hər iki telefonda görsənəcək!");
+        alert("Mal əlavə edildi!");
     }
+
+function renderRecent() {
+    const container = document.getElementById('recentList');
+    const url = "https://script.google.com/macros/s/AKfycbxX8RkwTALd5bJbk2jJs3R44zU7ZX-Twh7EDZtqFft3QbeimMa7s1H80SngVU26IIFE-Q/exec";
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            const lastItems = data.slice(-10).reverse();
+            container.innerHTML = lastItems.map(item => `
+                <div style="border-bottom:1px solid #eee; padding:10px; margin-bottom:5px; background:#f9f9f9; border-radius:5px;">
+                    <b>${item[0]}</b> - ${item[1]} <br>
+                    <small style="color:gray;">${item[2]}</small>
+                </div>
+            `).join('');
+        }).catch(() => {
+            container.innerHTML = "<p style='padding:10px;'>Yüklənir...</p>";
+        });
 }
-        
+
+window.onload = renderRecent;
+      
 // BU HİSSƏ CƏDVƏLDƏN OXUYUR VƏ HƏMİSİNİ GÖSTƏRİR
 function renderRecent() {
     const container = document.getElementById('recentList');
