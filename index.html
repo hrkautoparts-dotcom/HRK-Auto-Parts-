@@ -10,9 +10,11 @@
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #f4f7f6; margin: 0; padding-bottom: 30px; }
         
+        /* Giriş Ekranı */
         #loginPage { background: var(--blue); height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: fixed; width: 100%; top: 0; left: 0; z-index: 9999; }
         .login-card { background: white; padding: 35px; border-radius: 20px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         
+        /* Əsas Səhifələr */
         #mainContent, #allPartsPage { display: none; }
         header { background: var(--blue); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .container { padding: 15px; }
@@ -26,6 +28,7 @@
         .btn-back { background: #6c757d; width: auto; padding: 8px 20px; margin-bottom: 15px; }
         .search-bar { width: 100%; padding: 16px; border: 2px solid var(--blue); border-radius: 50px; font-size: 16px; margin-bottom: 20px; background: white; }
         
+        /* Mal Kartları */
         .item-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); border: 1px solid #eee; }
         .car-badge { background: #e8f0fe; color: var(--accent); padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
         .brand-badge { background: #fff3e0; color: #e65100; padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; margin-left: 5px; }
@@ -36,6 +39,7 @@
         .controls { display: flex; gap: 8px; margin-top: 15px; }
         .btn-qty { flex: 1; padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 12px; }
 
+        /* Qeyd Dəftəri Modalı */
         #cartModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 400px; border-radius: 20px; padding: 20px; }
     </style>
@@ -56,7 +60,6 @@
         <header>
             <div style="font-size: 18px; font-weight: 700;">HRK AUTO PARTS</div>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <div onclick="refreshData()" style="cursor:pointer; font-size: 20px;">🔄</div>
                 <div onclick="toggleCart()" style="cursor:pointer; font-size: 24px;">🛒</div>
                 <div onclick="logout()" style="cursor:pointer; font-size: 12px; border: 1px solid white; padding: 2px 8px; border-radius: 5px;">ÇIXIŞ</div>
             </div>
@@ -108,7 +111,7 @@
     </div>
 
     <script>
-        // BURA ÖZ LINKINI YAPIŞDIR
+        // GOOGLE APPS SCRIPT LINKINI BURA QOYUN
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxX8RkwTALd5bJbk2jJs3R44zU7ZX-Twh7EDZtqFft3QbeimMa7s1H80SngVU26IIFE-Q/exec";
         
         let database = [];
@@ -116,7 +119,7 @@
         window.onload = function() {
             if(localStorage.getItem('hrk_logged_status') === 'active') showMainPage();
             document.getElementById('cartInput').value = localStorage.getItem('hrk_notes') || "";
-            setInterval(refreshData, 10000); // Hər 10 saniyədən bir başqa telefonun etdiyi dəyişikliyi yoxlayır
+            setInterval(refreshData, 10000); // Hər 10 saniyədən bir canlı sinxronizasiya
         }
 
         async function refreshData() {
@@ -128,7 +131,7 @@
                 }));
                 renderRecent();
                 if(document.getElementById('allPartsPage').style.display === 'block') doSearch();
-            } catch (e) { console.log("Yenilənmə xətası"); }
+            } catch (e) { console.log("Məlumat yenilənmədi"); }
         }
 
         function handleLogin() {
@@ -165,7 +168,7 @@
             if(part.car && part.n) {
                 await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(part) });
                 ['carName','brandName','partName','code','alt','price','qty'].forEach(id => document.getElementById(id).value = "");
-                alert("Mal bazaya əlavə edildi!");
+                alert("Mal əlavə edildi!");
                 refreshData();
             }
         }
@@ -209,7 +212,6 @@
                 const newQty = Math.max(0, database[idx].q + change);
                 database[idx].q = newQty; 
                 if(document.getElementById('allPartsPage').style.display === 'block') doSearch(); else renderRecent();
-                
                 await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({updateId: id, newQty: newQty}) });
             }
         }
