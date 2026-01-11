@@ -9,21 +9,20 @@
         :root { --blue: #0a2351; --accent: #1a73e8; --green: #27ae60; --red: #d32f2f; }
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: #f4f7f6; margin: 0; padding-bottom: 30px; }
-        #loginPage { background: var(--blue); height: 100vh; display: flex; align-items: center; justify-content: center; position: fixed; width: 100%; top: 0; z-index: 9999; }
+        #loginPage { background: var(--blue); height: 100vh; display: flex; align-items: center; justify-content: center; position: fixed; width: 100%; top: 0; left: 0; z-index: 9999; }
         .login-card { background: white; padding: 35px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; }
         #mainContent, #allPartsPage { display: none; }
         header { background: var(--blue); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .container { padding: 15px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; outline: none; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 15px; outline: none; }
         button { width: 100%; padding: 12px; background: var(--blue); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; }
         .admin-card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; border-left: 8px solid var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .item-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #eee; position: relative; }
-        .car-badge { background: #e8f0fe; color: var(--accent); padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; }
-        .item-name { font-weight: 700; font-size: 17px; display: block; margin-top: 5px; }
+        .car-badge { background: #e8f0fe; color: var(--accent); padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .item-name { font-weight: 700; font-size: 17px; display: block; margin-top: 5px; color: #333; }
         .item-price { color: var(--green); font-weight: 700; font-size: 18px; position: absolute; right: 15px; top: 15px; }
-        .alt-code-box { background: #f9f9f9; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 13px; border: 1px dashed #ccc; }
         .controls { display: flex; gap: 8px; margin-top: 15px; }
-        .btn-qty { flex: 1; padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; }
+        .btn-qty { flex: 1; padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -34,18 +33,19 @@
             <input type="text" id="u" placeholder="İstifadəçi adı">
             <input type="password" id="p" placeholder="Şifrə">
             <button onclick="handleLogin()">DAXİL OL</button>
-            <p id="errorText" style="color: var(--red); display: none; margin-top:10px;">Məlumatlar səhvdir!</p>
+            <p id="errorText" style="color: var(--red); display: none; font-weight: bold; margin-top: 10px;">Məlumatlar səhvdir!</p>
         </div>
     </div>
 
     <div id="mainContent">
         <header>
-            <div style="font-size: 18px; font-weight: 700;">HRK AUTO</div>
-            <div style="display: flex; gap: 15px;">
+            <div style="font-size: 18px; font-weight: 700;">HRK AUTO PARTS</div>
+            <div style="display: flex; gap: 15px; align-items: center;">
                 <div onclick="refreshData()" style="cursor:pointer; font-size: 20px;">🔄</div>
                 <div onclick="logout()" style="cursor:pointer; font-size: 12px; border: 1px solid white; padding: 2px 8px; border-radius: 5px;">ÇIXIŞ</div>
             </div>
         </header>
+        
         <div class="container">
             <div class="admin-card">
                 <input type="text" id="carName" placeholder="Maşın markası">
@@ -59,7 +59,7 @@
                 </div>
                 <button onclick="addNewPart()" style="background:var(--accent)">BAZAYA VUR</button>
             </div>
-            <button onclick="openAllParts()" style="background:var(--accent); margin-bottom:15px;">🔍 BAZADA AXTAR</button>
+            <button onclick="openAllParts()" style="background:var(--accent); margin-bottom: 20px;">🔍 BAZADA AXTAR</button>
             <div id="recentList"></div>
         </div>
     </div>
@@ -82,7 +82,7 @@
 
         window.onload = function() {
             if(localStorage.getItem('hrk_logged_status') === 'active') showMainPage();
-            setInterval(refreshData, 30000); // Hər 30 saniyədən bir avtomatik yenilənmə
+            setInterval(refreshData, 10000); // Hər 10 saniyədən bir avtomatik yenilənmə
         }
 
         async function refreshData() {
@@ -94,7 +94,7 @@
                 }));
                 renderRecent();
                 if(document.getElementById('allPartsPage').style.display === 'block') doSearch();
-            } catch (e) { console.log("Yüklənmə xətası"); }
+            } catch (e) { console.log("Yenilənmə alınmadı."); }
         }
 
         function handleLogin() {
@@ -128,7 +128,7 @@
             if(part.car && part.n) {
                 await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(part) });
                 ['carName','brandName','partName','code','alt','price','qty'].forEach(id => document.getElementById(id).value = "");
-                alert("Mal bazaya əlavə edildi!");
+                alert("Əlavə edildi!");
                 refreshData();
             }
         }
@@ -159,7 +159,7 @@
             const idx = database.findIndex(x => x.id == id);
             if(idx !== -1) {
                 const newQty = Math.max(0, database[idx].q + change);
-                database[idx].q = newQty; // Ekranda dərhal göstər
+                database[idx].q = newQty; 
                 if(document.getElementById('allPartsPage').style.display === 'block') doSearch(); else renderRecent();
                 
                 await fetch(SCRIPT_URL, {
@@ -167,12 +167,12 @@
                     mode: "no-cors",
                     body: JSON.stringify({updateId: id, newQty: newQty})
                 });
-                setTimeout(refreshData, 1000); // 1 saniyə sonra mərkəzdən təsdiqlə
+                setTimeout(refreshData, 1500);
             }
         }
 
         async function deletePart(id) {
-            if(confirm("Bu malı hamı üçün SİLİNSİN?")) {
+            if(confirm("Bu malı bütün telefonlardan silmək istəyirsiniz?")) {
                 await fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({deleteId: id}) });
                 database = database.filter(x => x.id != id);
                 if(document.getElementById('allPartsPage').style.display === 'block') doSearch(); else renderRecent();
